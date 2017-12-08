@@ -23,6 +23,27 @@ bool explode_check(char* string) {
     return false;
 }
 
+/**
+ * Takes a string and changes it to a intenger. This is done by the ASCII table
+ *  and chars.
+ * @return[Int] The string as a intenger.
+ */
+//TODO: @add to main.h file (98)
+int string_to_int(char* string) {
+    int number = 0;
+    // for coor_to_int as stupidly it adds a space at ends some times
+    for (int i = 0; i < strlen(string); ++i) {
+        if (string[i] == ' ') {
+            string[i] = '\0';
+        }
+    }
+    // ends here
+    for (int i = 0; i < strlen(string); ++i) {
+        number = number * 10 + (string[i] - '0');
+    }
+    return number;
+}
+
 //TODO: @add to main.h file (98)
 //TODO: [write] function definition (99)
 bool valid_explode(char* string) {
