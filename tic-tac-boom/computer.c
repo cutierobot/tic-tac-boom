@@ -16,11 +16,11 @@
  */
 int is_automatic_player(Game* game) {
 	if (game->turn == 'x') {
-		if (xAuto) {
+		if (game->xAuto) {
 			return PLAYER_X;
 		}
 	} else {
-		if (oAuto) {
+		if (game->oAuto) {
 			return PLAYER_O;
 		}
 	}

@@ -3,19 +3,19 @@ CFLAGS = -Wall -pedantic -std=gnu99 -g
 
 .PHONY: clean all
 
-all: computer main
+all: computer game
 
-computer: computer.o
-	$(CC) $(CFLAGS) -o computer computer.o
+computer: computer.o game.o
+	$(CC) $(CFLAGS) -o computer computer.o game.o
 
-computer.o: computer.c computer.h
+computer.o: computer.c computer.h game.h
 	$(CC) $(CFLAGS) -c computer.c
 
-main: main.o 
-	$(CC) $(CFLAGS) -o tic-tac-boom main.o
+game: game.o 
+	$(CC) $(CFLAGS) -o tic-tac-boom game.o
 
-main.o: main.c main.h
-	$(CC) $(CFLAGS) -c main.c
+game.o: game.c game.h
+	$(CC) $(CFLAGS) -c game.c
 
 # acrophobe: player.o acrophobe.o common.o  
 # 	$(CC) $(CFLAGS) -o acrophobe player.o acrophobe.o common.o 
