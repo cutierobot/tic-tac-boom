@@ -234,18 +234,27 @@ bool valid_coordinates_check(char* string) {
     return true;
 }
 
-//TODO: [write] function definition (99)
-//TODO: rewrite this function
+/**
+ * Prints out the grid to stdout
+ * @param game The game struct containing the game grid
+ */
 void print_grid(Game* game) {
     for (int i = 0; i < game->gridSize; ++i) {
-        printf(" %c | %c | %c \n", game->grid[i][0], game->grid[i][1], 
-                game->grid[i][2]);
-        if (i != 2) {
-            printf("___|___|___\n");
-        } else {
-            printf("   |   |   \n");
+        for (int j = 0; j < game->gridSize-1; ++j) {
+            printf(" %c |", game->grid[i][j]);
+        }
+        printf("\n");
+        if (i != game->gridSize-1) {
+            for (int k = 0; k < game->gridSize-1; ++k) {
+                printf("___|");
+            }
+            printf("___\n");
         }
     }
+    for (int l = 0; l < game->gridSize-1; ++l) {
+        printf("   |");
+    }
+    printf("\n");
 }
 
 //TODO: [write] function definition (99)
