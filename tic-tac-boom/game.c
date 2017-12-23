@@ -44,16 +44,23 @@ Game* set_game_values(int arg, char** args) {
 }
 
 void play_game(Game* game) {
-    if (game->turn == 'X') {
-    	printf("X turn\n");
     	char* move = (char*)malloc(STRING_LENGTH * sizeof(char));
+        int xCoordinates, yCoordinates;
+    if (game->turn == 'X') {
+        printf("X turn\n");
     	move = get_move(game);
-    	int xCoordinates = seperate_space(move, true);
-    	int yCoordinates = seperate_space(move, false);
+    	xCoordinates = seperate_space(move, true);
+    	yCoordinates = seperate_space(move, false);
     	printf("%d-%d\n", xCoordinates, yCoordinates);
     } else {
     	printf("O turn\n");
+        // char* move = (char*)malloc(STRING_LENGTH * sizeof(char));
+        move = get_move(game);
+        xCoordinates = seperate_space(move, true);
+        yCoordinates = seperate_space(move, false);
+        printf("%d-%d\n", xCoordinates, yCoordinates);
     }
+    free(move);
 }
 
 /**
@@ -63,7 +70,6 @@ void play_game(Game* game) {
  * @param  firstHalf[Bool] the coordiante we want
  * @return[String] the coordiante wanted.
  */
-// NOTE: malloc returned variable
 int seperate_space(char* string, bool firstHalf) {
 	int length = (int)strlen(string);
 	char* stringCopy = (char*)malloc(length * sizeof(char));
@@ -73,7 +79,6 @@ int seperate_space(char* string, bool firstHalf) {
 		copy = true;
 		for (int i = 0; i < length; ++i) {
 			if (copy) {
-				printf("fkdjkfjdkjkl\n");
 				stringCopy[stringLength++] = string[i];
 				if (string[i] == ' ') {
 					copy = false;
@@ -94,6 +99,7 @@ int seperate_space(char* string, bool firstHalf) {
 	}
 	stringCopy[stringLength] = '\0';	
 	int number = string_to_int(stringCopy);
+    free(stringCopy);
 	return number;
 }
 
@@ -114,9 +120,10 @@ bool has_space(char* string) {
 }
 
 //TODO: [write] function definition (99)
+//NOTE: malloc returned value
 char* get_move(Game* game) {
 	printf("move: ");
-    char move[80];
+    char* move = (char*)malloc(80 * sizeof(char));
     if (fgets(move, 80, stdin) != NULL) {
     	remove_newline_trail(move);
     	int moveLength = (int)strlen(move);
@@ -133,9 +140,10 @@ char* get_move(Game* game) {
     	if (!has_space(move)) {
     		error_print(INVALID_MOVE);
     	}
-    	if (!is_number(move)) {
+    	/*if (!is_number(move)) {
+            printf("not number\n");
     		error_print(INVALID_MOVE);
-    	}
+    	}*/
     	return move;
     } else {
     	error_print(INVALID_MOVE);
@@ -231,6 +239,19 @@ bool valid_explode(char* string) {
 //TODO: @add to main.h file (98)
 //TODO: create func valid_coordinates_check
 bool valid_coordinates_check(char* string) {
+    int moveLength = (int)strlen(string);
+    bool twoDigits = false;
+    for (int i = 0; i < moveLength; ++i) {
+        if (string[i] == ' ') {
+            twoDigits = true;
+        }
+    }
+    if (!twoDigits) {
+        return false;
+    }
+    if (!has_space(string)) {
+        return false;
+    }
     return true;
 }
 

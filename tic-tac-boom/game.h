@@ -31,4 +31,5 @@ bool is_number(char* string);
 int seperate_space(char* string, bool firstHalf);
 bool has_space(char* string);
 void play_game(Game* game);
+// void valid_coordinates_check(char* string);
 #endif
