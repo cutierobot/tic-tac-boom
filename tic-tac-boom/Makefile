@@ -11,11 +11,18 @@ computer: computer.o game.o
 computer.o: computer.c computer.h game.h
 	$(CC) $(CFLAGS) -c computer.c
 
-game: game.o 
+game: game.o
 	$(CC) $(CFLAGS) -o tic-tac-boom game.o
 
 game.o: game.c game.h
 	$(CC) $(CFLAGS) -c game.c
+
+# debugHelper: debugHelper.o
+# 	$(CC) $(CFLAGS) -o debug debugHelper.o
+
+# debugHelper.o: debugHelper.c debugHelper.h
+# 	$(CC) $(CFLAGS) -c debugHelper.c
+
 
 # acrophobe: player.o acrophobe.o common.o  
 # 	$(CC) $(CFLAGS) -o acrophobe player.o acrophobe.o common.o 

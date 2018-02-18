@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include "debugHelper.h"
 #include "game.h"
 #define STRING_LENGTH 80
 
@@ -43,32 +44,41 @@ Game* set_game_values(int arg, char** args) {
    return game;
 }
 
+//TODO: [write] function definition (99)
 void play_game(Game* game) {
     	char* move = (char*)malloc(STRING_LENGTH * sizeof(char));
         int xCoordinates, yCoordinates;
-    if (game->turn == 'X') {
-        printf("X turn\n");
-    	move = get_move(game);
-    	xCoordinates = seperate_space(move, true);
-    	yCoordinates = seperate_space(move, false);
-    	printf("%d-%d\n", xCoordinates, yCoordinates);
-    } else {
-    	printf("O turn\n");
-        // char* move = (char*)malloc(STRING_LENGTH * sizeof(char));
-        move = get_move(game);
-        xCoordinates = seperate_space(move, true);
-        yCoordinates = seperate_space(move, false);
-        printf("%d-%d\n", xCoordinates, yCoordinates);
-    }
+        bool end = false;
+        while(end != true) {
+           if (game->turn == 'X') {
+                printf("X turn\n");
+                move = get_move(game);
+                xCoordinates = seperate_space(move, true);
+                yCoordinates = seperate_space(move, false);
+                printf("%d-%d\n", xCoordinates, yCoordinates);
+            } else {
+                printf("O turn\n");
+                // char* move = (char*)malloc(STRING_LENGTH * sizeof(char));
+                move = get_move(game);
+                xCoordinates = seperate_space(move, true);
+                yCoordinates = seperate_space(move, false);
+                printf("%d-%d\n", xCoordinates, yCoordinates);
+            }
+            add_coordinates_to_grid(game, xCoordinates, yCoordinates); 
+            change_turn(game);
+        }
+    
     free(move);
 }
 
 /**
  * Sepeperates the coordinates for the game. If firstHalf is true then the 
- * first coordinates is returned, else the second coordiantes is returned. 
+ * first coordinates is returned, else the second coordiantes is returned. If
+ * the given string does not contain any numbers, disregarding the seperating
+ * space, -1 will be returned.
  * @param  string    The string with the two coordinates
  * @param  firstHalf[Bool] the coordiante we want
- * @return[String] the coordiante wanted.
+ * @return[String] the coordiante wanted or -1.
  */
 int seperate_space(char* string, bool firstHalf) {
 	int length = (int)strlen(string);
@@ -97,10 +107,22 @@ int seperate_space(char* string, bool firstHalf) {
 			}	
 		}	
 	}
-	stringCopy[stringLength] = '\0';	
-	int number = string_to_int(stringCopy);
+	stringCopy[stringLength] = '\0';
+
+    if (!is_number(stringCopy)) {
+        printf(RED "not number\n" RESET);
+        free(stringCopy);
+        return -1;
+    }
+    int number = string_to_int(stringCopy);
     free(stringCopy);
 	return number;
+}
+
+//TODO: [write] function definition (99)
+void add_coordinates_to_grid(Game* game, int x, int y) {
+    game->grid[y][x] = game->turn;
+    print_grid(game);
 }
 
 /**
@@ -119,31 +141,23 @@ bool has_space(char* string) {
 	return false;
 }
 
-//TODO: [write] function definition (99)
 //NOTE: malloc returned value
+/**
+ * Gets the move entered in by a manual player. Checks to see if the move 
+ * entered in is a number. If move doesn't contain numbers, excluding 
+ * seperating space, 'invalid' is returned else the move is returned.
+ * @param  game The Game struct for this particular game.
+ * @return      'invalid' or the move  string
+ */
 char* get_move(Game* game) {
 	printf("move: ");
     char* move = (char*)malloc(80 * sizeof(char));
     if (fgets(move, 80, stdin) != NULL) {
     	remove_newline_trail(move);
-    	int moveLength = (int)strlen(move);
-    	bool twoDigits = false;
-    	for (int i = 0; i < moveLength; ++i) {
-    		if (move[i] == ' ') {
-    			twoDigits = true;
-    		}
-    	}
-    	if (!twoDigits) {
-    		error_print(INVALID_MOVE);
-    	}
-    	//TODO: need to seperate the two numbers with the space
-    	if (!has_space(move)) {
-    		error_print(INVALID_MOVE);
-    	}
-    	/*if (!is_number(move)) {
-            printf("not number\n");
-    		error_print(INVALID_MOVE);
-    	}*/
+        
+        if (!valid_coordinates_check(move, game)) {
+            error_print(INVALID_MOVE);
+        }
     	return move;
     } else {
     	error_print(INVALID_MOVE);
@@ -152,15 +166,31 @@ char* get_move(Game* game) {
 
 //TODO: [write] function definition (99)
 bool is_number(char* string) {
+    char* needle = "1234567890";
+    // char* ret;
+    // ret = strstr(string, needle);
+    // //TODO: change t value to something meaningful
+    int t = 0;
+    t = strspn(string, needle);
+    // ret = strstr(string, needle);
+    int length = (int)strlen(string);
+    // if (ret == NULL) {
+    if (t != length) {
+        return false;
+    } else {
+        return true;
+    }
+}
+/*bool is_number(char string) {
 	char* needle = "1234567890";
 	char* ret;
-	ret = strstr(string, needle);
+    ret = strchr(needle, string);
 	if (ret == NULL) {
 		return false;
 	} else {
 		return true;
 	}
-}
+}*/
 
 /**
  * When using fgets, this function will take that string and remove the trailing
@@ -196,7 +226,7 @@ void create_grid(Game* game) {
  * @param  string the string that the human player entered
  * @return[Bool]    true if string is to explode, false otherwise
  */
-//TODO: @add to main.h file (98)
+//TODO: @add to game.h file (98)
 bool explode_check(char* string) {
     if (strstr(string, "boom") != NULL) {
         return true;
@@ -224,7 +254,7 @@ int string_to_int(char* string) {
     return number;
 }
 
-//TODO: @add to main.h file (98)
+//TODO: @add to game.h file (98)
 //TODO: [write] function definition (99)
 bool valid_explode(char* string) {
     if (strstr(string, "boom") == NULL) {
@@ -235,23 +265,58 @@ bool valid_explode(char* string) {
     return true;
 
 }
-//TODO: [write] function definition (99)
-//TODO: @add to main.h file (98)
-//TODO: create func valid_coordinates_check
-bool valid_coordinates_check(char* string) {
-    int moveLength = (int)strlen(string);
+
+/**
+ * Changes the turn of the player. If current player is 'X' this function
+ * changes it to 'O'.
+ * @param game the Game struct for this current session
+ */
+void change_turn(Game* game) {
+    if (game->turn == 'O') {
+        game->turn = 'X';
+    } else {
+        game->turn = 'O';
+    }
+}
+
+/**
+ * Determins if the given coordinates are valid. A valid coordinate set is 
+ * defined as having a X and Y coordinate that is only numbers and within the 
+ * board bounds. False is returned for any coordinate set that doesn't meet
+ * this criteria.   
+ * @param  set the coordinate set
+ * @return [Bool] true if valid, false otherwise
+ */
+bool valid_coordinates_check(char* set, Game* game) {
+    int moveLength = (int)strlen(set);
     bool twoDigits = false;
+    int xCheck = 0;
+    int yCheck = 0;
     for (int i = 0; i < moveLength; ++i) {
-        if (string[i] == ' ') {
+        if (set[i] == ' ') {
             twoDigits = true;
         }
     }
+
     if (!twoDigits) {
         return false;
     }
-    if (!has_space(string)) {
+
+    if (!has_space(set)) {
         return false;
     }
+    xCheck = seperate_space(set, true);
+    yCheck = seperate_space(set, false);
+    //make sure the coordinates are numbers
+    if (xCheck == -1 || yCheck == -1) {
+        return false;
+    }
+
+    if (xCheck >= game->gridSize || yCheck >= game->gridSize) {
+        return false;
+    }
+
+    //TODO: check that the given coordiantes are withing the board bounds
     return true;
 }
 
@@ -322,3 +387,16 @@ void error_print(int errorCode) {
         	break;
     }
 }
+
+
+
+
+
+void red_print(char* message) {
+    printf(RED "%s\n" RESET, message);
+}
+
+void yellow_print(char* message) {
+    printf(YELLOW "%s\n" RESET, message);
+}
+
